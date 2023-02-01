@@ -18,8 +18,8 @@ function Login() {
     },
   })
   return (
-    <div style={{ backgroundImage: 'linear-gradient(to bottom right,#232526 85%,#414345)' }}>
-      <Grid spacing={2} style={{ textAlign: 'center', padding: '200px' }}>
+    <div style={{ backgroundImage: 'linear-gradient(to bottom right,#232526 85%,#414345)',height:"100vh" }}>
+      <Grid spacing={2} style={{ textAlign: 'center', padding: '230px' }}>
         <Grid>
           <Typography variant='h5' sx={{ color: 'white', paddingRight: '330px' }}>
             Login
@@ -59,7 +59,7 @@ function Login() {
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
             />
-            <Typography sx={{ paddingLeft: '240px', color: 'white' }}>
+            <Typography sx={{ paddingLeft: '240px', color: 'white',cursor:"pointer" }}>
               Forget Password...?
             </Typography>
           </Grid>

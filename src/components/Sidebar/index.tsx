@@ -1,4 +1,4 @@
-import * as React from 'react'
+import  React,{useState} from 'react'
 import { styled, Theme, CSSObject } from '@mui/material/styles'
 import { Link } from 'react-router-dom'
 import Box from '@mui/material/Box'
@@ -27,6 +27,7 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Diversity3Icon from '@mui/icons-material/Diversity3'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
+import ROLE_BASE_ROUTE from "../../Constant/index"
 import { useAppSelector, useAppDispatch } from '../../hooks'
 import { SET_CLOSE_SIDEBAR, SET_OPEN_SIDEBAR } from '../../redux/features/sidebar'
 import { RootState } from '../../redux/store'
@@ -104,7 +105,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 )
 
 export default function SideBar() {
-  const [open, setOpen] = React.useState<any>({})
+  const [open, setOpen] = useState<any>({})
+  const [getColletUserPermmision,setCollectUserPermission]=useState<any>()
+  console.log("ROLE_BASE_ROUTE",ROLE_BASE_ROUTE)
 
   const collectAllPageRoute = [
     {
@@ -118,6 +121,7 @@ export default function SideBar() {
         { id: 4, subLable: 'Categories', path: '/Categories' },
         { id: 5, subLable: 'Products', path: '/Products' },
       ],
+      permission:null
     },
     {
       id: 2,
@@ -127,6 +131,7 @@ export default function SideBar() {
         { id: 1, subLable: 'Purchase', path: '/Purchase' },
         { id: 2, subLable: 'Approval', path: '/Approval' },
       ],
+      permission:null
     },
     {
       id: 3,
@@ -136,6 +141,7 @@ export default function SideBar() {
         { id: 1, subLable: 'All Invoice', path: '/Invoice' },
         { id: 2, subLable: 'Approval', path: '/InvoiceApproval' },
       ],
+      permission:null
     },
 
     {
@@ -143,6 +149,7 @@ export default function SideBar() {
       label: 'Stock',
       logo: <LocalMallIcon />,
       subDropDown: [{ id: 1, subLable: 'Add Stock', path: '/Stock' }],
+      permission:null
     },
     {
       id: 5,
@@ -154,6 +161,7 @@ export default function SideBar() {
         { id: 3, subLable: 'Purchase Return ', path: '/' },
         { id: 4, subLable: 'Sales Return ', path: '/' },
       ],
+      permission:null
     },
     {
       id: 6,
@@ -163,14 +171,17 @@ export default function SideBar() {
         { id: 1, subLable: 'Employees', path: '/Employees' },
         { id: 1, subLable: 'Attendance', path: '/EmployeesAttendence' },
       ],
+      permission:null
     },
     {
       id: 7,
       label: 'Payments',
       logo: <PaidIcon />,
       subDropDown: [{ id: 1, subLable: 'Add Payments', path: '/' }],
+      permission:null
     },
   ]
+
   // REDUX STATES
   const dispatch = useAppDispatch()
 

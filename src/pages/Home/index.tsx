@@ -52,7 +52,7 @@ function Home() {
           <BarChart />
         </Grid>
       </Grid>
-      <Typography variant='h5' sx={{ mt: 33 }}>
+      <Typography variant='h5' sx={{ mt: 35 }}>
         Weekly Sales Report
       </Typography>
       <Grid container spacing={2} sx={{ mt: 3 }}>
