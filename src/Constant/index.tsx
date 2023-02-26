@@ -5,4 +5,8 @@
 
 }
 
-export default ROLE_BASE_ROTE
+const API_END_POINT={
+    GET_SUPPLIERS_DATA:"api/inventory/fetchSupplier"
+}
+
+export default { ROLE_BASE_ROTE,API_END_POINT}

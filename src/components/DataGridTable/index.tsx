@@ -21,6 +21,7 @@ function CustomDataGrid(props: any) {
           rows={rows}
           columns={columns}
           pageSize={5}
+          getRowId={(row: any) =>  row?._id}
           loading={rows === 0 ? true : false}
           rowsPerPageOptions={[5]}
           checkboxSelection

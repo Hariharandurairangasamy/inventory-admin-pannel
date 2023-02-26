@@ -6,45 +6,50 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import CustomDataGrid from '../../components/DataGridTable'
 import AddIcon from '@mui/icons-material/Add'
 import { GridColDef } from '@mui/x-data-grid'
+import API_END_POINT from "../../Constant/index"
 import DialogModel from '../../components/Model'
 import { useSearchParams } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import {get} from "lodash"
+import useFetchHooks from '../../CustomHooks/useFetch'
 
 function Suppliers() {
   const [open, setOpen] = React.useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DATA}`)
+
+
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
+    { field: '_id', headerName: 'ID', width: 200 },
     {
-      field: 'Customer Name',
-      headerName: 'First name',
+      field: 'supplierName',
+      headerName: 'SupplierName',
       width: 150,
     },
     {
-      field: 'Supplier Phone',
-      headerName: 'Last name',
+      field: 'phone',
+      headerName: 'Phone',
       width: 150,
     },
     {
-      field: ' PhoneNo',
-      headerName: 'Supplier PhoneNo',
-      type: 'number',
-      width: 160,
+      field: 'email',
+      headerName: 'Email',
+      width: 200,
     },
     {
-      field: 'Address',
-      headerName: 'Supplier Address',
-      type: 'number',
-      width: 180,
+      field: 'address',
+      headerName: 'Address',
+      width: 200,
     },
 
     {
       field: 'Action',
       headerAlign: 'center',
-      width: 200,
+      width: 240,
       renderCell: (cellValues) => {
         return (
           <Grid container spacing={2} sx={{ ml: 3 }}>
@@ -78,17 +83,7 @@ function Suppliers() {
     },
   ]
 
-  const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  ]
+
   const formik = useFormik({
     initialValues: {
       supplierName: '',
@@ -137,7 +132,7 @@ function Suppliers() {
       </Grid>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid xs={12}>
-          <CustomDataGrid rows={rows} columns={columns} height={340} />
+          <CustomDataGrid rows={get(response,"data",[])}  columns={columns} height={340} />
         </Grid>
       </Grid>
       <DialogModel isOpen={open} handleClose={handleClose}>
