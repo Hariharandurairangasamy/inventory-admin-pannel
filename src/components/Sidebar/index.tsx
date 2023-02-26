@@ -106,7 +106,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function SideBar() {
   const [open, setOpen] = useState<any>({})
- 
+  const [getColletUserPermmision,setCollectUserPermission]=useState<any>()
+  console.log("ROLE_BASE_ROUTE",ROLE_BASE_ROUTE)
 
   const collectAllPageRoute = [
     {

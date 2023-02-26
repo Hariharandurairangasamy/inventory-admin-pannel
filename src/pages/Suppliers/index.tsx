@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import { Grid, Button, Typography, TextField } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -13,6 +13,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {get} from "lodash"
 import useFetchHooks from '../../CustomHooks/useFetch'
+import usePostQuery from '../../CustomHooks/usePost'
 
 function Suppliers() {
   const [open, setOpen] = React.useState(false)
@@ -21,6 +22,8 @@ function Suppliers() {
   const handleClose = () => setOpen(false)
 
 const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DATA}`)
+
+console.log("response",response)
 
 
   const columns: GridColDef[] = [
@@ -84,6 +87,7 @@ const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DA
   ]
 
 
+
   const formik = useFormik({
     initialValues: {
       supplierName: '',
@@ -101,9 +105,10 @@ const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DA
       address: Yup.string().required('Required!'),
     }),
     onSubmit: (values) => {
-      console.log('collectData', values)
+    console.log("values",values)
     },
   })
+
 
   return (
     <div>
@@ -217,6 +222,7 @@ const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DA
                 }}
                 type='submit'
                 disabled={!(formik.isValid && formik.dirty)}
+              
               >
                 {searchParams.get('mode') === 'Add' ? 'Add' : 'Update'}
               </Button>

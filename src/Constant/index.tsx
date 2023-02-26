@@ -6,7 +6,8 @@
 }
 
 const API_END_POINT={
-    GET_SUPPLIERS_DATA:"api/inventory/fetchSupplier"
+    GET_SUPPLIERS_DATA:"api/inventory/fetchSupplier",
+    POST_SUPPLIER_DATA:"api/inventory/createSupplier"
 }
 
 export default { ROLE_BASE_ROTE,API_END_POINT}
