@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react'
+import React,{useEffect,useCallback, useState} from 'react'
 import { Grid, Button, Typography, TextField } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -12,18 +12,31 @@ import { useSearchParams } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {get} from "lodash"
-import useFetchHooks from '../../CustomHooks/useFetch'
-import usePostQuery from '../../CustomHooks/usePost'
+import { API_SERVICE } from '../../Service'
+import { AxiosError, AxiosResponse } from 'axios'
+
 
 function Suppliers() {
   const [open, setOpen] = React.useState(false)
+  const [getSuppliersDatas,setGetSuppliersDatas]=useState()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
-const {response}=useFetchHooks(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DATA}`)
+  const getMode = searchParams.get('mode')
 
-console.log("response",response)
+const getSuppliersData = useCallback(()=>{
+ API_SERVICE.fetchApiData(`${API_END_POINT?.API_END_POINT?.GET_SUPPLIERS_DATA}`,(res:AxiosResponse)=>{
+  setGetSuppliersDatas(get(res,"data",[]))
+ },(err:AxiosError)=>{
+  console.log(err)
+ })
+},[])
+
+useEffect(()=>{
+  getSuppliersData()
+},[])
+
 
 
   const columns: GridColDef[] = [
@@ -92,7 +105,7 @@ console.log("response",response)
     initialValues: {
       supplierName: '',
       email: '',
-      phone: '',
+      phone: 0,
       address: '',
     },
     validationSchema: Yup.object({
@@ -105,7 +118,22 @@ console.log("response",response)
       address: Yup.string().required('Required!'),
     }),
     onSubmit: (values) => {
-    console.log("values",values)
+
+      getMode === "Add" || null ?
+        API_SERVICE.postApiData(`${API_END_POINT.API_END_POINT.POST_SUPPLIER_DATA}`,(res:AxiosResponse)=>{
+          getSuppliersData()
+          handleClose()
+
+        },(err:AxiosError)=>{
+          console.error(err)
+        },values)
+      :
+        API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_SUPPLIERS_DATA}`,(res:AxiosResponse)=>{
+          console.log(res)
+        },(err:AxiosError)=>{
+          console.log(err)
+        },values
+      )
     },
   })
 
@@ -137,7 +165,7 @@ console.log("response",response)
       </Grid>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid xs={12}>
-          <CustomDataGrid rows={get(response,"data",[])}  columns={columns} height={340} />
+          <CustomDataGrid rows={get(getSuppliersDatas,"data",[])}  columns={columns} height={340} />
         </Grid>
       </Grid>
       <DialogModel isOpen={open} handleClose={handleClose}>
@@ -168,6 +196,7 @@ console.log("response",response)
                 variant='outlined'
                 size='small'
                 fullWidth
+                type="number"
                 sx={{ mt: 2 }}
                 name='phone'
                 onChange={formik.handleChange}
