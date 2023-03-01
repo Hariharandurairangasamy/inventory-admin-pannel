@@ -37,12 +37,13 @@ export const API_SERVICE={
             errorCallBack && errorCallBack(error)
         })
     },
-    deleteApiData:(EndPoint:string,successCalBack:any,errorCallBack:any)=>{
+    deleteApiData:(EndPoint:string,successCalBack:any,errorCallBack:any,values:any)=>{
         Axios.delete(`${SERVER?.BACKEND_HOST_URL}/${EndPoint}`,{
             headers:{
                 "Content-Type":"application/json",
                 "Access-Control-Allow-Origin":"*",
-            }
+            },
+            data:{...values},
         }).then((response)=>{
             successCalBack && successCalBack(response)
         }).catch((error)=>{

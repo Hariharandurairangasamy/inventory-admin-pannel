@@ -13,12 +13,15 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {get} from "lodash"
 import { API_SERVICE } from '../../Service'
+import {toast,ToastContainer} from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css'
 import { AxiosError, AxiosResponse } from 'axios'
 
 
 function Suppliers() {
   const [open, setOpen] = React.useState(false)
   const [getSuppliersDatas,setGetSuppliersDatas]=useState()
+  const [getUniqueSuppliersData,setGetUniqueSupplierData]=useState()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -37,7 +40,13 @@ useEffect(()=>{
   getSuppliersData()
 },[])
 
-
+const getUniqueData = useCallback((params:any)=>{
+  API_SERVICE.fetchApiData(`${API_END_POINT?.API_END_POINT?.GET_UNIQUE_SUPPLIER_DATA}/${params}`,(res:AxiosResponse)=>{
+    setGetUniqueSupplierData(get(res,"data.data",[]))
+    },(err:AxiosError)=>{
+     console.log(err)
+    }) 
+},[])
 
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 200 },
@@ -66,7 +75,7 @@ useEffect(()=>{
       field: 'Action',
       headerAlign: 'center',
       width: 240,
-      renderCell: (cellValues) => {
+      renderCell: (params) => {
         return (
           <Grid container spacing={2} sx={{ ml: 3 }}>
             <Grid xs={4}>
@@ -81,7 +90,8 @@ useEffect(()=>{
               <EditIcon
                 sx={{ color: 'green', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Edit' })
+                  handleOpen(), setSearchParams({ mode: 'Edit' }),
+                  getUniqueData(params.row._id)
                 }}
               />
             </Grid>
@@ -89,7 +99,7 @@ useEffect(()=>{
               <DeleteIcon
                 sx={{ color: 'red', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Delete' })
+                  handleDelete(params.row._id,params.row)
                 }}
               />
             </Grid>
@@ -117,15 +127,19 @@ useEffect(()=>{
       phone: Yup.string().required('Required!'),
       address: Yup.string().required('Required!'),
     }),
-    onSubmit: (values) => {
+    onSubmit: (values,{resetForm}) => {
 
       getMode === "Add" || null ?
         API_SERVICE.postApiData(`${API_END_POINT.API_END_POINT.POST_SUPPLIER_DATA}`,(res:AxiosResponse)=>{
           getSuppliersData()
           handleClose()
+          toast.success("Data Added SuccessFully")
+          resetForm()
 
         },(err:AxiosError)=>{
           console.error(err)
+          toast.error("Data not added")
+          resetForm()
         },values)
       :
         API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_SUPPLIERS_DATA}`,(res:AxiosResponse)=>{
@@ -134,9 +148,20 @@ useEffect(()=>{
           console.log(err)
         },values
       )
+     
     },
   })
+const handleDelete = useCallback((params:any,getData:any)=>{
+ 
+API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/${params}`,(res:AxiosResponse)=>{
+  getSuppliersData()
+  toast.success("Data Deleted SuccessFully")
+},(err:AxiosError)=>{
+  toast.error("Data Not Deleted")
+},getData) 
+},[])
 
+console.log("getUniqueSuppliersData",get(getUniqueSuppliersData,"supplierName"))
 
   return (
     <div>
@@ -185,9 +210,10 @@ useEffect(()=>{
                 name='supplierName'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.supplierName}
+                defaultValue={getMode === "Add"?formik.values.supplierName:`${get(getUniqueSuppliersData,"supplierName")}`}
                 error={formik.touched.supplierName && Boolean(formik.errors.supplierName)}
                 helperText={formik.touched.supplierName && formik.errors.supplierName}
+                
               />
             </Grid>
             <Grid xs={12}>
@@ -201,7 +227,8 @@ useEffect(()=>{
                 name='phone'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.phone}
+                // value={formik.values.phone}
+                defaultValue={getMode === "Add"?formik.values.phone:"default"}
                 error={formik.touched.phone && Boolean(formik.errors.phone)}
                 helperText={formik.touched.phone && formik.errors.phone}
               />
@@ -216,7 +243,8 @@ useEffect(()=>{
                 name='email'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.email}
+                // value={formik.values.email}
+                defaultValue={getMode === "Add"?formik.values.email:"default"}
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 helperText={formik.touched.email && formik.errors.email}
               />
@@ -231,7 +259,8 @@ useEffect(()=>{
                 name='address'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.address}
+                // value={formik.values.address}
+                defaultValue={getMode === "Add"?formik.values.address:"default"}
                 error={formik.touched.address && Boolean(formik.errors.address)}
                 helperText={formik.touched.address && formik.errors.address}
               />
@@ -259,6 +288,7 @@ useEffect(()=>{
           )}
         </form>
       </DialogModel>
+      <ToastContainer position='top-right'/>
     </div>
   )
 }
