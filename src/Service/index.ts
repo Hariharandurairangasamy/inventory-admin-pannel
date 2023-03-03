@@ -25,7 +25,7 @@ export const API_SERVICE={
             errorCallBack && errorCallBack(error)
         })
     },
-    updateApiData:(EndPoint:string,values:any,successCalBack:any,errorCallBack:any)=>{
+    updateApiData:(EndPoint:string,successCalBack:any,errorCallBack:any,values:any)=>{
         Axios.patch(`${SERVER?.BACKEND_HOST_URL}/${EndPoint}`,values,{
             headers:{
                 "Content-Type":"application/json",

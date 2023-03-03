@@ -21,7 +21,6 @@ import { AxiosError, AxiosResponse } from 'axios'
 function Suppliers() {
   const [open, setOpen] = React.useState(false)
   const [getSuppliersDatas,setGetSuppliersDatas]=useState<any>()
-  const [getUniqueSuppliersData,setGetUniqueSupplierData]=useState()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -38,20 +37,32 @@ const getSuppliersData = useCallback(()=>{
  })
 },[])
 
+const handleDelete = useCallback((params:any,getData:any)=>{
+ 
+  API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/${params}`,(res:AxiosResponse)=>{
+    getSuppliersData()
+    toast.success("Data Deleted SuccessFully")
+  },(err:AxiosError)=>{
+    toast.error("Data Not Deleted")
+  },getData) 
+  },[])
+  
 
-
-const getUniqueData = useCallback((params:any)=>{
-  API_SERVICE.fetchApiData(`${API_END_POINT?.API_END_POINT?.GET_UNIQUE_SUPPLIER_DATA}/${params}`,(res:AxiosResponse)=>{
-    setGetUniqueSupplierData(get(res,"data.data",""))
+useEffect(()=>{
+  if(getId){
+  API_SERVICE.fetchApiData(`${API_END_POINT?.API_END_POINT?.GET_UNIQUE_SUPPLIER_DATA}/${getId}`,(res:AxiosResponse)=>{
+    formik.setFieldValue("supplierName",get(res,"data.data.supplierName",""))
+    formik.setFieldValue("phone",get(res,"data.data.phone",""))
+    formik.setFieldValue("email",get(res,"data.data.email",""))
+    formik.setFieldValue("address",get(res,"data.data.address",""))
+ 
     },(err:AxiosError)=>{
      console.log(err)
     }) 
-},[])
-
-useEffect(()=>{
+  }
   getSuppliersData()
-  getUniqueData(null)
-},[getSuppliersData,getUniqueData])
+  },[getId,getSuppliersData])
+
 
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 200 },
@@ -87,8 +98,8 @@ useEffect(()=>{
               <VisibilityIcon
                 sx={{ color: 'blue', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'View' })
-                  getUniqueData(params.row._id)
+                  handleOpen(), setSearchParams({ mode: 'View',id:params.row._id  })
+                
                 }}
               />
             </Grid>
@@ -96,8 +107,8 @@ useEffect(()=>{
               <EditIcon
                 sx={{ color: 'green', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Edit',id:params.row._id }),
-                  getUniqueData(params.row._id)
+                  handleOpen(), setSearchParams({ mode: 'Edit',id:params.row._id })
+                
                 }}
               />
             </Grid>
@@ -161,15 +172,6 @@ useEffect(()=>{
      
     },
   })
-const handleDelete = useCallback((params:any,getData:any)=>{
- 
-API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/${params}`,(res:AxiosResponse)=>{
-  getSuppliersData()
-  toast.success("Data Deleted SuccessFully")
-},(err:AxiosError)=>{
-  toast.error("Data Not Deleted")
-},getData) 
-},[])
 
 
   return (
@@ -220,7 +222,7 @@ API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/$
                 disabled={getMode === "View"?true:false}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                defaultValue={getMode === "Add"?formik.values.supplierName:get(getUniqueSuppliersData,"supplierName")}
+                value={formik.values.supplierName}
                 error={formik.touched.supplierName && Boolean(formik.errors.supplierName)}
                 helperText={formik.touched.supplierName && formik.errors.supplierName}
                 
@@ -238,8 +240,7 @@ API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/$
                 name='phone'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                // value={formik.values.phone}
-                defaultValue={getMode === "Add"?formik.values.phone:get(getUniqueSuppliersData,"phone")}
+                value={formik.values.phone}
                 error={formik.touched.phone && Boolean(formik.errors.phone)}
                 helperText={formik.touched.phone && formik.errors.phone}
               />
@@ -255,8 +256,7 @@ API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/$
                 disabled={getMode === "View"?true:false}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                // value={formik.values.email}
-                defaultValue={getMode === "Add"?formik.values.email:get(getUniqueSuppliersData,"email")}
+                value={formik.values.email}
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 helperText={formik.touched.email && formik.errors.email}
               />
@@ -272,8 +272,7 @@ API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DETELE_SUPPLIER_DATA}/$
                 disabled={getMode === "View"?true:false}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                // value={formik.values.address}
-                defaultValue={getMode === "Add"?formik.values.address:get(getUniqueSuppliersData,"address")}
+                value={formik.values.address}
                 error={formik.touched.address && Boolean(formik.errors.address)}
                 helperText={formik.touched.address && formik.errors.address}
               />
