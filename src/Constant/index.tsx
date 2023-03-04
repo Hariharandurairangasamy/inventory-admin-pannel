@@ -16,7 +16,14 @@ const API_END_POINT={
     UPDATE_UNIT_DATA:"api/inventory/updateUnitsData",
     GET_UNIT_DATA:"api/inventory/getunitsdata",
     GET_UNIT_UNIQUE_DATA:"api/inventory/getUniqueData",
-    DELETE_UNIT_DATA:"api/inventory/deleteUnitsData"
+    DELETE_UNIT_DATA:"api/inventory/deleteUnitsData",
+    // Categories
+    GET_CATEGORIES_DATA:"api/inventory/getCategoriesData",
+    POST_CATEGORIES_DATA:"api/inventory/createcategories",
+    DELETE_CATEGORIES_DATA:"api/inventory/deleteCategories",
+    UPDATE_CATEGORIES_DATA:"api/inventory/editCategories",
+    GET_UNIQUE_CATEGORIES_DATA:"api/inventory/getUniqueCateoriesData"
+
 }
 
 export default { ROLE_BASE_ROTE,API_END_POINT}
