@@ -10,7 +10,13 @@ const API_END_POINT={
     POST_SUPPLIER_DATA:"api/inventory/createSupplier",
     UPDATE_SUPPLIERS_DATA:"api/inventory/editSupplier",
     DETELE_SUPPLIER_DATA:"api/inventory/deletSuppliers",
-    GET_UNIQUE_SUPPLIER_DATA:"api/inventory/fetchUniqueDataSupplier"
+    // Units
+    GET_UNIQUE_SUPPLIER_DATA:"api/inventory/fetchUniqueDataSupplier",
+    POST_UNIT_DATA:"api/inventory/createUnits",
+    UPDATE_UNIT_DATA:"api/inventory/updateUnitsData",
+    GET_UNIT_DATA:"api/inventory/getunitsdata",
+    GET_UNIT_UNIQUE_DATA:"api/inventory/getUniqueData",
+    DELETE_UNIT_DATA:"api/inventory/deleteUnitsData"
 }
 
 export default { ROLE_BASE_ROTE,API_END_POINT}
