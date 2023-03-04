@@ -49,5 +49,17 @@ export const API_SERVICE={
         }).catch((error)=>{
             errorCallBack && errorCallBack(error)
         })
-    }
+    },
+    postFormDataApi:(EndPoint:string,successCallBack:any,errorCallBack:any,values:any)=>{
+        Axios.post(`${SERVER?.BACKEND_HOST_URL}/${EndPoint}`,values,{
+            headers:{
+                'Content-Type':'multipart/form-data',
+                'Access-Control-Allow-Origin':'*',
+            },
+        }).then((responce)=>{
+            successCallBack && successCallBack(responce)
+        }).catch((error)=>{
+            errorCallBack && errorCallBack(error)
+        })
+    },
 }

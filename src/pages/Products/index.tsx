@@ -45,15 +45,15 @@ const getAutoCompleteValuesData= useCallback(()=>{
   },(err:AxiosError)=>{
     console.log(err)
   })
-  
+
   // Get Products Data
 
   API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_PRODUCTS_DATA}`,(res:AxiosResponse)=>{
     setGetProductsDatas(get(res,"data",[]))
-    console.log("repostory",get(res,"data.data",[]))
   },(err:AxiosError)=>{
     console.log(err)
   })
+
 },[])
 
 const handleDelete=(id:any,values:any)=>{

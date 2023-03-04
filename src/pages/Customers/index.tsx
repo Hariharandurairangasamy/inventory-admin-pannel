@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState,useEffect,useCallback} from 'react'
 import { Grid, Button, Typography, TextField } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -8,36 +8,76 @@ import AddIcon from '@mui/icons-material/Add'
 import { GridColDef } from '@mui/x-data-grid'
 import DialogModel from '../../components/Model'
 import { useSearchParams } from 'react-router-dom'
+import { ToastContainer,toast } from 'react-toastify'
+import { API_SERVICE } from '../../Service'
+import {get} from "lodash"
+import API_END_POINT from "../../Constant/index"
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { AxiosError, AxiosResponse } from 'axios'
 
 function Customers() {
   const [open, setOpen] = React.useState(false)
+  const [getCustomersData,setGetCustomersData]=useState<any>()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+  const getMode = searchParams.get("mode")
+  const getId = searchParams.get("id")
+
+const handleGetCustomersData = useCallback(()=>{
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_CUSTOMERS_DATA}`,(res:AxiosResponse)=>{
+    setGetCustomersData(get(res,"data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+},[])
+
+const handleDelete=(id:any,values:any)=>{
+  API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DELETE_CUSTOMER_DATA}/${id}`,(res:AxiosResponse)=>{
+    toast.success("Data Deleted SuccessFully")
+    handleGetCustomersData()
+  },(err:AxiosError)=>{
+    toast.error("Data Not Deleted SuccessFully")
+  },values)
+}
+
+useEffect(()=>{
+  if(getId){
+    API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_UNIQUE_CUSTOMER_DATA}/${getId}`,(res:AxiosResponse)=>{
+      formik.setFieldValue("customerName",get(res,"data.data.customerName",""))
+      formik.setFieldValue("phone",get(res,"data.data.phone",""))
+      formik.setFieldValue("email",get(res,"data.data.email",""))
+      formik.setFieldValue("address",get(res,"data.data.address",""))
+
+    },(err:AxiosError)=>{
+      console.log(err)
+    })
+  }
+  handleGetCustomersData()
+},[handleGetCustomersData,getId])
+
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 90 },
     {
-      field: 'Customer Name',
-      headerName: 'First name',
+      field: 'customerName',
+      headerName: 'Customer Name',
       width: 150,
     },
     {
-      field: 'Supplier Phone',
+      field: 'phone',
       headerName: 'Phone',
       width: 150,
     },
     {
-      field: ' email',
+      field: 'email',
       headerName: 'Email',
-      type: 'number',
       width: 100,
     },
     {
-      field: 'Address',
-      headerName: 'Supplier Address',
-      type: 'number',
+      field: 'address',
+      headerName: 'Address',
       width: 160,
     },
     {
@@ -45,19 +85,27 @@ function Customers() {
       headerName: 'Images',
       type: 'number',
       width: 110,
+      renderCell:(data)=>{
+      
+        return(
+          <div>
+            <img src={get(data?.row,"customerPicture","")} alt="customerData" />
+          </div>
+        )
+      }
     },
     {
       field: 'Action',
       headerAlign: 'center',
       width: 200,
-      renderCell: (cellValues) => {
+      renderCell: (params) => {
         return (
           <Grid container spacing={2} sx={{ ml: 3 }}>
             <Grid xs={4}>
               <VisibilityIcon
                 sx={{ color: 'blue', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'View' })
+                  handleOpen(), setSearchParams({ mode: 'View',id:params.row._id  })
                 }}
               />
             </Grid>
@@ -65,7 +113,7 @@ function Customers() {
               <EditIcon
                 sx={{ color: 'green', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Edit' })
+                  handleOpen(), setSearchParams({ mode: 'Edit',id:params.row._id })
                 }}
               />
             </Grid>
@@ -73,7 +121,8 @@ function Customers() {
               <DeleteIcon
                 sx={{ color: 'red', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Delete' })
+                  handleDelete(params.row._id,params.row),
+                 setSearchParams({ mode: 'Delete' })
                 }}
               />
             </Grid>
@@ -83,37 +132,49 @@ function Customers() {
     },
   ]
 
-  const rows = [
-    { _id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { _id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { _id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { _id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { _id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { _id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { _id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { _id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { _id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  ]
+
   const formik = useFormik({
     initialValues: {
       customerName: '',
       email: '',
       phone: '',
       address: '',
-      imageUpload: '',
+      customerPicture: '',
     },
     validationSchema: Yup.object({
       customerName: Yup.string()
-        .min(2, 'Mininum 2 characters')
-        .max(15, 'Maximum 15 characters')
         .required('Required!'),
       email: Yup.string().email('Invalid email format').required('Required!'),
       phone: Yup.string().required('Required!'),
       address: Yup.string().required('Required!'),
-      imageUpload: Yup.string().required('Required!'),
+      customerPicture: Yup.string().required('Required!'),
     }),
-    onSubmit: (values) => {
-      console.log('collectData', values)
+    onSubmit: (values,{resetForm}) => {
+console.log("values",values)
+    const formData =new FormData()
+    formData.append("customerName",values?.customerName)
+    formData.append("email",values?.email)
+    formData.append("phone",values?.phone)
+    formData.append("address",values?.address)
+    formData.append("customerPicture",values?.customerPicture)
+      getMode === "Add" || null ? API_SERVICE.postFormDataApi(`${API_END_POINT.API_END_POINT.POST_CUSTOMER_DATA}`,(res:AxiosResponse)=>{
+        toast.success("Data Added SuccessFully")
+        resetForm()
+        handleClose()
+        handleGetCustomersData()
+      },(err:AxiosError)=>{
+        toast.error("Data Not Added")
+        console.log(err)
+      },formData)
+      : API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_CUSTOMER_DATA}/${getId}`,(res:AxiosResponse)=>{
+        resetForm()
+        toast.success("Data Updatad SuccessFully")
+        handleClose()
+        handleGetCustomersData()
+      },(err:AxiosError)=>{
+        console.log(err)
+        toast.error("Data Not Updataed")
+      },formData)
     },
   })
   return (
@@ -143,7 +204,7 @@ function Customers() {
       </Grid>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid xs={12}>
-          <CustomDataGrid rows={rows} columns={columns} height={340} />
+          <CustomDataGrid rows={get(getCustomersData,"data",[])} columns={columns} height={340} />
         </Grid>
       </Grid>
       <DialogModel isOpen={open} handleClose={handleClose}>
@@ -161,6 +222,7 @@ function Customers() {
                 size='small'
                 fullWidth
                 name='customerName'
+                disabled={getMode === "View"?true:false}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.customerName}
@@ -220,12 +282,12 @@ function Customers() {
                 size='small'
                 fullWidth
                 sx={{ mt: 2 }}
-                name='imageUpload'
+                name='customerPicture'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.imageUpload}
-                error={formik.touched.imageUpload && Boolean(formik.errors.imageUpload)}
-                helperText={formik.touched.imageUpload && formik.errors.imageUpload}
+                value={formik.values.customerPicture}
+                error={formik.touched.customerPicture&& Boolean(formik.errors.customerPicture)}
+                helperText={formik.touched.customerPicture&& formik.errors.customerPicture}
               />
             </Grid>
           </Grid>
@@ -250,6 +312,7 @@ function Customers() {
           )}
         </form>
       </DialogModel>
+      <ToastContainer />
     </div>
   )
 }

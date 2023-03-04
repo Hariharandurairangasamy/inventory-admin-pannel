@@ -28,7 +28,14 @@ const API_END_POINT={
     GET_PRODUCTS_DATA:"api/inventory/getProductData",
     UPDATE_PRODUCTS_DATA:"api/inventory/updateData",
     DELETE_PRODUCTS_DATA:"api/inventory/productsDeleted",
-    GET_UNIQUE_PRODUCTS_DATA:"api/inventory/getUniqueProductsData"
+    GET_UNIQUE_PRODUCTS_DATA:"api/inventory/getUniqueProductsData",
+    // Customers
+    GET_CUSTOMERS_DATA:"api/inventory/getCustomerData",
+    POST_CUSTOMER_DATA:"api/inventory/createCustomer",
+    UPDATE_CUSTOMER_DATA:"api/inventory/updateCutomers",
+    DELETE_CUSTOMER_DATA:"api/inventory/deleteCustomer",
+    GET_UNIQUE_CUSTOMER_DATA:"api/inventory/getUniqueCustomerData"
+
 
 }
 
