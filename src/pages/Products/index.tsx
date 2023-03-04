@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState,useEffect,useCallback} from 'react'
 import { Grid, Button, Typography, TextField, Autocomplete } from '@mui/material'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
@@ -9,34 +9,114 @@ import { GridColDef } from '@mui/x-data-grid'
 import DialogModel from '../../components/Model'
 import { useSearchParams } from 'react-router-dom'
 import { useFormik } from 'formik'
+import { ToastContainer,toast } from 'react-toastify'
+import { API_SERVICE } from '../../Service'
+import API_END_POINT from "../../Constant/index"
 import { find, get } from 'lodash'
 import * as Yup from 'yup'
+import { AxiosError, AxiosResponse } from 'axios'
 
 function Products() {
   const [open, setOpen] = React.useState(false)
+  const [getUnitsData,setGetUnitsData]=useState<any>()
+  const [getSuppliersData,setGetSuppliersData]=useState<any>()
+  const [getCategoriesData,setGetCategoriesData]=useState<any>()
+  const [getProductsDatas,setGetProductsDatas]=useState<any>()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+  const getMode =searchParams.get("mode")
+  const getId = searchParams.get("id")
+
+const getAutoCompleteValuesData= useCallback(()=>{
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_CATEGORIES_DATA}`,(res:AxiosResponse)=>{
+    setGetCategoriesData(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_SUPPLIERS_DATA}`,(res:AxiosResponse)=>{
+    setGetSuppliersData(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_UNIT_DATA}`,(res:AxiosResponse)=>{
+    setGetUnitsData(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+  
+  // Get Products Data
+
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_PRODUCTS_DATA}`,(res:AxiosResponse)=>{
+    setGetProductsDatas(get(res,"data",[]))
+    console.log("repostory",get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+},[])
+
+const handleDelete=(id:any,values:any)=>{
+  API_SERVICE.deleteApiData(`${API_END_POINT.API_END_POINT.DELETE_PRODUCTS_DATA}/${id}`,(res:AxiosResponse)=>{
+    toast.success("Data Deleted SuccessFully")
+  },(err:AxiosError)=>{
+    toast.error("Data is Not Deleted")
+  },values)
+}
+
+useEffect(()=>{
+  if(getId){
+    API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_UNIQUE_PRODUCTS_DATA}/${getId}`,(res:AxiosResponse)=>{ 
+      formik.setFieldValue("productName",get(res,"data.data.productName",""))
+      formik.setFieldValue("supplierName",get(res,"data.data.supplierName","")) 
+      formik.setFieldValue("unitName",get(res,"data.data.unitName",""))
+      formik.setFieldValue("categoryName",get(res,"data.data.categoryName",""))
+    },(err:AxiosError)=>{
+      console.log(err)
+    })
+  }
+  getAutoCompleteValuesData()
+},[getAutoCompleteValuesData,getId])
+
+
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 90 },
     {
-      field: 'units',
-      headerName: 'Units',
-      width: 670,
+      field: 'categoryName',
+      headerName: 'categoryName',
+      width: 270,
     },
+    {
+      field: 'unitName',
+      headerName: 'unitName',
+      width: 270,
+    },
+
+    {
+      field: 'productName',
+      headerName: 'productName',
+      width: 270,
+    },
+
+    {
+      field: 'supplierName',
+      headerName: 'supplierName',
+      width: 270,
+    },
+
 
     {
       field: 'Action',
       headerAlign: 'center',
       width: 200,
-      renderCell: (cellValues) => {
+      renderCell: (params) => {
         return (
           <Grid container spacing={2} sx={{ ml: 3 }}>
             <Grid xs={4}>
               <VisibilityIcon
                 sx={{ color: 'blue', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'View' })
+                  handleOpen(), setSearchParams({ mode: 'View',id:params.row._id })
                 }}
               />
             </Grid>
@@ -44,7 +124,7 @@ function Products() {
               <EditIcon
                 sx={{ color: 'green', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Edit' })
+                  handleOpen(), setSearchParams({ mode: 'Edit',id:params.row._id })
                 }}
               />
             </Grid>
@@ -52,7 +132,8 @@ function Products() {
               <DeleteIcon
                 sx={{ color: 'red', cursor: 'pointer' }}
                 onClick={() => {
-                  handleOpen(), setSearchParams({ mode: 'Delete' })
+                  handleDelete(params.row._id,params.row),
+               setSearchParams({ mode: 'Delete',id:params.row._id })
                 }}
               />
             </Grid>
@@ -62,11 +143,7 @@ function Products() {
     },
   ]
 
-  const rows = [
-    { _id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { _id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-   
-  ]
+
   const formik = useFormik({
     initialValues: {
       productName: '',
@@ -80,15 +157,29 @@ function Products() {
       unitName: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
       categoryName: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
     }),
-    onSubmit: (values) => {
-      console.log('collectData', values)
+    onSubmit: (values,{resetForm}) => {
+    
+      getMode === "Add" || null ? API_SERVICE.postApiData(`${API_END_POINT.API_END_POINT.POST_PRODUCTS_DATA}`,(res:AxiosResponse)=>{
+        toast.success(" Data added SuccessFully")
+        getAutoCompleteValuesData()
+        handleClose()
+        resetForm()
+      },(err:AxiosError)=>{
+        console.log(err)
+        toast.error("Products Not Added")
+      },values)
+      : API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_PRODUCTS_DATA}/${getId}`,(res:AxiosResponse)=>{
+        toast.success("Products Data Updated")
+        getAutoCompleteValuesData()
+        handleClose()
+        resetForm()
+      },(err:AxiosError)=>{
+        console.log(err)
+        toast.error("Products Data Not Updated")
+      },values)
     },
   })
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-  ]
+
   return (
     <div>
       <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -116,7 +207,7 @@ function Products() {
       </Grid>
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid xs={12}>
-          <CustomDataGrid rows={rows} columns={columns} height={340} />
+          <CustomDataGrid rows={get(getProductsDatas,"data",[])} columns={columns} height={340} />
         </Grid>
       </Grid>
       <DialogModel isOpen={open} handleClose={handleClose}>
@@ -135,6 +226,7 @@ function Products() {
                 fullWidth
                 name='productName'
                 onChange={formik.handleChange}
+                disabled={getMode==="View" ? true:false}
                 onBlur={formik.handleBlur}
                 value={formik.values.productName}
                 error={formik.touched.productName && Boolean(formik.errors.productName)}
@@ -147,9 +239,10 @@ function Products() {
                 id='category'
                 size='small'
                 style={{ width: '100%' }}
-                options={top100Films}
-                value={find(top100Films, (o: any) => o.label === formik.values.supplierName)}
-                getOptionLabel={(option: any) => option.label}
+                disabled={getMode==="View" ? true:false}
+                options={getSuppliersData}
+                value={find(getSuppliersData, (o: any) => o.supplierName === formik.values.supplierName)}
+                getOptionLabel={(option: any) => option.supplierName}
                 sx={{ width: 300 }}
                 renderInput={(params) => (
                   <TextField
@@ -162,24 +255,26 @@ function Products() {
                   />
                 )}
                 onChange={(e, value) => {
-                  formik.setFieldValue('supplierName', get(value, 'label'))
+                  formik.setFieldValue('supplierName', get(value, 'supplierName'))
                 }}
               />
             </Grid>
             <Grid xs={12} sx={{ mt: 1 }}>
+       
               <Autocomplete
                 disablePortal
                 id='category'
                 size='small'
                 style={{ width: '100%' }}
-                options={top100Films}
-                value={find(top100Films, (o: any) => o.label === formik.values.unitName)}
-                getOptionLabel={(option: any) => option.label}
+                options={getUnitsData}
+                disabled={getMode==="View" ? true:false}
+                value={find(getUnitsData, (o: any) => o.unitsName === formik.values.unitName)}
+                getOptionLabel={(option: any) => option.unitsName}
                 sx={{ width: 300 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label='UnitName'
+                    label='unitsName'
                     name='unitName'
                     error={formik.touched.unitName && Boolean(formik.errors.unitName)}
                     helperText={formik.touched.unitName && formik.errors.unitName}
@@ -187,7 +282,8 @@ function Products() {
                   />
                 )}
                 onChange={(e, value) => {
-                  formik.setFieldValue('unitName', get(value, 'label'))
+                  
+                  formik.setFieldValue('unitName', get(value, 'unitsName',""))
                 }}
               />
             </Grid>
@@ -197,9 +293,10 @@ function Products() {
                 id='category'
                 size='small'
                 style={{ width: '100%' }}
-                options={top100Films}
-                value={find(top100Films, (o: any) => o.label === formik.values.categoryName)}
-                getOptionLabel={(option: any) => option.label}
+                options={getCategoriesData}
+                disabled={getMode==="View" ? true:false}
+                value={find(getCategoriesData, (o: any) => o.categoriesName === formik.values.categoryName)}
+                getOptionLabel={(option: any) => option.categoriesName}
                 sx={{ width: 300 }}
                 renderInput={(params) => (
                   <TextField
@@ -212,7 +309,7 @@ function Products() {
                   />
                 )}
                 onChange={(e, value) => {
-                  formik.setFieldValue('categoryName', get(value, 'label'))
+                  formik.setFieldValue('categoryName', get(value, 'categoriesName'))
                 }}
               />
             </Grid>
@@ -238,6 +335,7 @@ function Products() {
           )}
         </form>
       </DialogModel>
+      <ToastContainer />
     </div>
   )
 }

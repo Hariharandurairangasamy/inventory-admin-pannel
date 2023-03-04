@@ -22,7 +22,13 @@ const API_END_POINT={
     POST_CATEGORIES_DATA:"api/inventory/createcategories",
     DELETE_CATEGORIES_DATA:"api/inventory/deleteCategories",
     UPDATE_CATEGORIES_DATA:"api/inventory/editCategories",
-    GET_UNIQUE_CATEGORIES_DATA:"api/inventory/getUniqueCateoriesData"
+    GET_UNIQUE_CATEGORIES_DATA:"api/inventory/getUniqueCateoriesData",
+    // Products
+    POST_PRODUCTS_DATA:"api/inventory/createProducts",
+    GET_PRODUCTS_DATA:"api/inventory/getProductData",
+    UPDATE_PRODUCTS_DATA:"api/inventory/updateData",
+    DELETE_PRODUCTS_DATA:"api/inventory/productsDeleted",
+    GET_UNIQUE_PRODUCTS_DATA:"api/inventory/getUniqueProductsData"
 
 }
 

@@ -1,5 +1,5 @@
 const SERVER={
-    BACKEND_HOST_URL:"https://inventory-admin.onrender.com"
-
+    BACKEND_HOST_URL:"http://localhost:5009"
 }
+
 export default SERVER
