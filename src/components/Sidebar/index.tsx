@@ -180,6 +180,13 @@ export default function SideBar() {
       subDropDown: [{ id: 1, subLable: 'Add Payments', path: '/' }],
       permission:null
     },
+    {
+      id:8,
+      label:"Register",
+      logo:<Diversity3Icon/>,
+      subDropDown: [{ id: 1, subLable: 'Users', path: '/User' }],
+      permission:null
+    }
   ]
 
   // REDUX STATES

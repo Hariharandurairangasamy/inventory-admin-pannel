@@ -23,7 +23,10 @@ function Suppliers() {
   const [getSuppliersDatas,setGetSuppliersDatas]=useState<any>()
   const [searchParams, setSearchParams] = useSearchParams()
   const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const handleClose = () => {
+    setOpen(false)
+    formik.resetForm()
+  }
 
   const getMode = searchParams.get('mode')
   const getId = searchParams.get("id")

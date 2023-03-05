@@ -22,6 +22,7 @@ import EmployeesAttendence from '../EmployeesAttendence'
 import EmployeesDetails from '../EmployeesAttendence/CalendarDetails'
 import Login from '../Login'
 import PrivateRoute from '../PrivateRoute'
+import Users from '../User'
 
 export const handleRouter = createBrowserRouter([
   {
@@ -189,6 +190,14 @@ export const handleRouter = createBrowserRouter([
         element: (
           <PrivateRoute>
             <EmployeesDetails />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/User',
+        element: (
+          <PrivateRoute>
+            <Users />
           </PrivateRoute>
         ),
       },
