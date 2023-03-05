@@ -12,6 +12,8 @@ import { ToastContainer,toast } from 'react-toastify'
 import { API_SERVICE } from '../../Service'
 import {get} from "lodash"
 import API_END_POINT from "../../Constant/index"
+import SERVER from '../../Config'
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { AxiosError, AxiosResponse } from 'axios'
@@ -20,6 +22,8 @@ function Customers() {
   const [open, setOpen] = React.useState(false)
   const [getCustomersData,setGetCustomersData]=useState<any>()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [getUploadImage,setGetUploadUImage]=useState<any>()
+  const [getImagesEditMode,setGetImagesEditMode]=useState<any>()
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
 
@@ -46,6 +50,7 @@ const handleDelete=(id:any,values:any)=>{
 useEffect(()=>{
   if(getId){
     API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_UNIQUE_CUSTOMER_DATA}/${getId}`,(res:AxiosResponse)=>{
+      setGetImagesEditMode(get(res,"data.data.customerPicture",""))
       formik.setFieldValue("customerName",get(res,"data.data.customerName",""))
       formik.setFieldValue("phone",get(res,"data.data.phone",""))
       formik.setFieldValue("email",get(res,"data.data.email",""))
@@ -57,6 +62,8 @@ useEffect(()=>{
   }
   handleGetCustomersData()
 },[handleGetCustomersData,getId])
+
+
 
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 90 },
@@ -139,7 +146,7 @@ useEffect(()=>{
       email: '',
       phone: '',
       address: '',
-      customerPicture: '',
+      cloudineryId: getUploadImage,
     },
     validationSchema: Yup.object({
       customerName: Yup.string()
@@ -147,27 +154,26 @@ useEffect(()=>{
       email: Yup.string().email('Invalid email format').required('Required!'),
       phone: Yup.string().required('Required!'),
       address: Yup.string().required('Required!'),
-      customerPicture: Yup.string().required('Required!'),
+  
     }),
-    onSubmit: (values,{resetForm}) => {
-console.log("values",values)
+    onSubmit: (values) => {
     const formData =new FormData()
     formData.append("customerName",values?.customerName)
     formData.append("email",values?.email)
     formData.append("phone",values?.phone)
     formData.append("address",values?.address)
-    formData.append("customerPicture",values?.customerPicture)
-      getMode === "Add" || null ? API_SERVICE.postFormDataApi(`${API_END_POINT.API_END_POINT.POST_CUSTOMER_DATA}`,(res:AxiosResponse)=>{
-        toast.success("Data Added SuccessFully")
-        resetForm()
+    formData.append("cloudineryId",getUploadImage)
+      getMode === "Add" || null ? API_SERVICE.PostRequest(`${SERVER?.BACKEND_HOST_URL}/${API_END_POINT.API_END_POINT.POST_CUSTOMER_DATA}`,(res:AxiosResponse)=>{
+        formik.resetForm()
         handleClose()
+        toast.success("Data Added SuccessFully")
         handleGetCustomersData()
       },(err:AxiosError)=>{
         toast.error("Data Not Added")
         console.log(err)
       },formData)
-      : API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_CUSTOMER_DATA}/${getId}`,(res:AxiosResponse)=>{
-        resetForm()
+      : API_SERVICE.PatchRequest(`${SERVER?.BACKEND_HOST_URL}/${API_END_POINT.API_END_POINT.UPDATE_CUSTOMER_DATA}/${getId}`,(res:AxiosResponse)=>{
+        formik.resetForm()
         toast.success("Data Updatad SuccessFully")
         handleClose()
         handleGetCustomersData()
@@ -177,6 +183,8 @@ console.log("values",values)
       },formData)
     },
   })
+
+
   return (
     <div>
       <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -237,6 +245,7 @@ console.log("values",values)
                 size='small'
                 fullWidth
                 sx={{ mt: 2 }}
+                disabled={getMode === "View"?true:false}
                 name='phone'
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -254,6 +263,7 @@ console.log("values",values)
                 sx={{ mt: 2 }}
                 name='email'
                 onChange={formik.handleChange}
+                disabled={getMode === "View"?true:false}
                 onBlur={formik.handleBlur}
                 value={formik.values.email}
                 error={formik.touched.email && Boolean(formik.errors.email)}
@@ -269,6 +279,7 @@ console.log("values",values)
                 sx={{ mt: 2 }}
                 name='address'
                 onChange={formik.handleChange}
+                disabled={getMode === "View"?true:false}
                 onBlur={formik.handleBlur}
                 value={formik.values.address}
                 error={formik.touched.address && Boolean(formik.errors.address)}
@@ -276,19 +287,21 @@ console.log("values",values)
               />
             </Grid>
             <Grid xs={12}>
-              <TextField
-                variant='outlined'
-                type='file'
-                size='small'
-                fullWidth
-                sx={{ mt: 2 }}
-                name='customerPicture'
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.customerPicture}
-                error={formik.touched.customerPicture&& Boolean(formik.errors.customerPicture)}
-                helperText={formik.touched.customerPicture&& formik.errors.customerPicture}
-              />
+              <div style={{paddingTop:"10px"}}>
+            <input
+              style={{ display: "none" }}
+              id="contained-button-file"
+              type="file"
+              onChange={(e:any)=> setGetUploadUImage(e.target.files[0])}
+            />
+              <label htmlFor="contained-button-file">
+                <Button variant="contained" color="primary"   disabled={getMode === "View"?true:false} component="span" endIcon={<UploadFileIcon />}>
+                  Image
+                </Button>
+              </label>
+              </div>
+              {searchParams.get("mode") === "Edit" || searchParams.get("mode") === "View" ?( <img src={getImagesEditMode} style={{width:"100px",height:"100px"}}/>): null}
+
             </Grid>
           </Grid>
           {searchParams.get('mode') === 'View' ? null : (
@@ -303,7 +316,7 @@ console.log("values",values)
                   },
                   ml: -2,
                 }}
-                type='submit'
+               type="submit"
                 disabled={!(formik.isValid && formik.dirty)}
               >
                 {searchParams.get('mode') === 'Add' ? 'Add' : 'Update'}

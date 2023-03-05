@@ -50,16 +50,49 @@ export const API_SERVICE={
             errorCallBack && errorCallBack(error)
         })
     },
-    postFormDataApi:(EndPoint:string,successCallBack:any,errorCallBack:any,values:any)=>{
-        Axios.post(`${SERVER?.BACKEND_HOST_URL}/${EndPoint}`,values,{
-            headers:{
-                'Content-Type':'multipart/form-data',
-                'Access-Control-Allow-Origin':'*',
+    PostRequest: (
+        EndPoint: string,
+        sucessCallback: any,
+        errorCallback: any,
+        values: any,
+        contentType?: string,
+        token?: string
+      ) => {
+        Axios
+          .post(EndPoint, values, {
+            headers: {
+              'Content-Type': contentType || 'multipart/form-data',
+              'Access-Control-Allow-Origin': '*',
             },
-        }).then((responce)=>{
-            successCallBack && successCallBack(responce)
-        }).catch((error)=>{
-            errorCallBack && errorCallBack(error)
-        })
-    },
+          })
+          .then((resp) => {
+            sucessCallback && sucessCallback(resp)
+          })
+          .catch((err) => {
+            errorCallback && errorCallback(err)
+          })
+      },
+      PatchRequest: (
+        EndPoint: string,
+        sucessCallback: any,
+        errorCallback: any,
+        values: any,
+        contentType?: string,
+        token?: string
+      ) => {
+        Axios
+          .patch(EndPoint, values, {
+            headers: {
+              'Content-Type': contentType || 'multipart/form-data',
+              'Access-Control-Allow-Origin': '*',
+            },
+          })
+          .then((resp) => {
+            sucessCallback && sucessCallback(resp)
+          })
+          .catch((err) => {
+            errorCallback && errorCallback(err)
+          })
+      },
+    
 }
