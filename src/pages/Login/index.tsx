@@ -2,11 +2,13 @@ import React from 'react'
 import { TextField, Grid, Button, Typography } from '@mui/material'
 import { login } from '../../redux/authSlice'
 import {  useAppDispatch } from '../../hooks'
+import { useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 function Login() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const formik = useFormik({
     initialValues: {
       userName: '',
@@ -17,12 +19,15 @@ function Login() {
       password: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
     }),
     onSubmit: (values) => {
-     dispatch(login(values))
+     dispatch(login(values)).then(()=>{
+      navigate("/Home")
+     }).catch(()=>{
+      navigate("/")
+     })
+      
     },
   })
  
-
-
   return (
     <div style={{ backgroundImage: 'linear-gradient(to bottom right,#232526 85%,#414345)',height:"100vh" }}>
       <Grid spacing={2} style={{ textAlign: 'center', padding: '230px' }}>
@@ -74,6 +79,7 @@ function Login() {
               sx={{ mt: 1, backgroundColor: '#753a88', color: 'white', width: '30vh' }}
               type='submit'
               disabled={!(formik.isValid && formik.dirty)}
+          
             >
               Submit
             </Button>

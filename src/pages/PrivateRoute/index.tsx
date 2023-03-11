@@ -2,8 +2,17 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 
 function PrivateRoute({ children }: any) {
-  const getLocalStoreageValue = ''
-  return !getLocalStoreageValue ? children : <Navigate to='/' />
+  const getAuthToken = localStorage.getItem("token")
+
+
+if(getAuthToken){
+
+  return children
+}else{
+  return <Navigate to="/"/>
+}
+
+ 
 }
 
 export default PrivateRoute
