@@ -1,22 +1,28 @@
 import React from 'react'
 import { TextField, Grid, Button, Typography } from '@mui/material'
+import { login } from '../../redux/authSlice'
+import {  useAppDispatch } from '../../hooks'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 function Login() {
+  const dispatch = useAppDispatch()
   const formik = useFormik({
     initialValues: {
-      email: '',
+      userName: '',
       password: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
+      userName: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
       password: Yup.string().min(2, 'Mininum 2 characters').required('Required!'),
     }),
     onSubmit: (values) => {
-      console.log('collectData', values)
+     dispatch(login(values))
     },
   })
+ 
+
+
   return (
     <div style={{ backgroundImage: 'linear-gradient(to bottom right,#232526 85%,#414345)',height:"100vh" }}>
       <Grid spacing={2} style={{ textAlign: 'center', padding: '230px' }}>
@@ -35,12 +41,12 @@ function Login() {
               sx={{ width: '60vh', mt: 2, color: 'white' }}
               color='secondary'
               focused
-              name='email'
+              name='userName'
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.email}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
+              value={formik.values.userName}
+              error={formik.touched.userName && Boolean(formik.errors.userName)}
+              helperText={formik.touched.userName && formik.errors.userName}
             />
           </Grid>
           <Grid md={12}>
