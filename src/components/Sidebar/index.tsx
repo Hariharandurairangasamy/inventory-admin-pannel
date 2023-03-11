@@ -1,7 +1,8 @@
 import  React,{useState} from 'react'
 import { styled, Theme, CSSObject } from '@mui/material/styles'
-import { Link } from 'react-router-dom'
+import { Link,useNavigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
+import { Grid } from '@material-ui/core'
 import MuiDrawer from '@mui/material/Drawer'
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -17,7 +18,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import SupportAgentIcon from '@mui/icons-material/SupportAgent'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LocalMallIcon from '@mui/icons-material/LocalMall'
 import PaidIcon from '@mui/icons-material/Paid'
 import BarChartIcon from '@mui/icons-material/BarChart'
@@ -27,11 +28,13 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Diversity3Icon from '@mui/icons-material/Diversity3'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
-import ROLE_BASE_ROUTE from "../../Constant/index"
+import {   Popconfirm } from 'antd';
 import { useAppSelector, useAppDispatch } from '../../hooks'
 import { SET_CLOSE_SIDEBAR, SET_OPEN_SIDEBAR } from '../../redux/features/sidebar'
 import { RootState } from '../../redux/store'
 import { map } from 'lodash'
+import { logout } from '../../redux/authSlice'
+
 
 const drawerWidth = 240
 
@@ -106,8 +109,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function SideBar() {
   const [open, setOpen] = useState<any>({})
-  const [getColletUserPermmision,setCollectUserPermission]=useState<any>()
-  console.log("ROLE_BASE_ROUTE",ROLE_BASE_ROUTE)
 
   const collectAllPageRoute = [
     {
@@ -189,10 +190,24 @@ export default function SideBar() {
     }
   ]
 
+
+
+
   // REDUX STATES
   const dispatch = useAppDispatch()
 
   const { setSideBarPosition } = useAppSelector((state: RootState) => state.sidebar)
+
+    // Logout DropDown Prop
+    const text = 'Logout'
+    const navigate = useNavigate()
+
+    const confirm = () => {
+     dispatch(logout())
+     navigate("/")
+    };
+
+    
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -213,11 +228,36 @@ export default function SideBar() {
           >
             <MenuIcon />
           </IconButton>
-          <Link to='/' style={{ textDecoration: 'none', color: 'white' }}>
+          <Grid container spacing={2} >
+            <Grid md={8} lg={8} xl={8} >
+            <Link to='/Home' style={{ textDecoration: 'none', color: 'white' }}>
             <Typography variant='h6' noWrap component='div'>
               Inventory Admin Pannel
             </Typography>
           </Link>
+            </Grid>
+            <Grid md={4} lg={4} xl={4} style={{paddingLeft:"300px"}}>
+              <Grid container spacing={2}>
+                <Grid md={4} lg={4} xl={4} >
+             
+              <Popconfirm
+                  placement="bottom"
+                  title={text}
+                  onConfirm={confirm}
+                  okText="Yes"
+                  cancelText="No"
+                  
+                >
+               <AdminPanelSettingsIcon sx={{fontSize:"30px",marginTop:"10px"}}/>
+      </Popconfirm>
+              </Grid>
+              <Grid md={2} lg={2} xl={2} >
+                <p >Admin</p>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+          
         </Toolbar>
       </AppBar>
       <Drawer
@@ -250,6 +290,7 @@ export default function SideBar() {
             <ListItemButton
               onClick={() => {
                 setOpen({ ...open, [dropDownDatas?.id]: !open[dropDownDatas?.id] })
+             
               }}
             >
               <ListItemIcon sx={{ color: 'white' }}>{dropDownDatas?.logo}</ListItemIcon>
@@ -277,6 +318,7 @@ export default function SideBar() {
             </Collapse>
           </List>
         ))}
+            
       </Drawer>
     </Box>
   )

@@ -42,7 +42,7 @@ function Home() {
   ]
   return (
     <div>
-      <Grid container spacing={2} sx={{ mt: 7 }}>
+      <Grid container spacing={2} sx={{ mt: 5 }}>
         <Grid xs={6} sx={{ width: '100%', height: '50px' }}>
           <Typography variant='h6'>Purchase </Typography>
           <LineChart />

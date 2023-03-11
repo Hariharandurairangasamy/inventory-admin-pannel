@@ -154,9 +154,9 @@ function Categories() {
           </Button>
         </Grid>
       </Grid>
-      <Grid container spacing={2} sx={{ mt: 1 }}>
+      <Grid container spacing={2} sx={{ mt: 4 }}>
         <Grid xs={12}>
-          <CustomDataGrid rows={get(getCategoriesDatas,"data",[])} columns={columns} height={340} />
+          <CustomDataGrid rows={get(getCategoriesDatas,"data",[])} columns={columns} height={380} />
         </Grid>
       </Grid>
       <DialogModel isOpen={open} handleClose={handleClose}>

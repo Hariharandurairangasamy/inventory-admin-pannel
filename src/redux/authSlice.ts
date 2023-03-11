@@ -47,7 +47,7 @@ export const login = createAsyncThunk('auth/login', async (userData:any, thunkAP
         state.message = '';
       },
       logout: (state) => {
-        localStorage.removeItem('user');
+        localStorage.clear();
         state.isError = false;
         state.isLoading = false;
         state.isSuccess = false;

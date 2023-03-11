@@ -9,7 +9,7 @@ function Layout() {
     <div>
       <Box sx={{ display: 'flex' }}>
         <SideBar />
-        <Box component='main' sx={{ flexGrow: 1, p: 6 }}>
+        <Box component='main' sx={{ flexGrow: 1, p: 8 }}>
           <Box sx={{ width: '100%' }}>
             <CardDataCount />
           </Box>
