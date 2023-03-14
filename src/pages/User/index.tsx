@@ -9,6 +9,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import DialogModel from '../../components/Model'
 import { useSearchParams } from 'react-router-dom'
 import { useFormik } from 'formik'
+import {find,get, map} from "lodash"
 import Checkbox from '@mui/material/Checkbox';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
@@ -75,21 +76,23 @@ function Users() {
   const formik = useFormik({
     initialValues: {
       userName: '',
-      password:"",
+      password:'',
+      role:'',
       permissions:[""]
    
     },
     validationSchema: Yup.object({
         userName: Yup.string().required(),
         password: Yup.string().required(),
-        permissions:Yup.string().required(),
+        role: Yup.string().required(),
+      
 
     }),
     onSubmit: (values) => {
       console.log('collectData', values)
     },
   })
-  const top100Films = [
+  const top100Films:any = [
     { title: 'Read', year: 1994 },
     { title: 'Write', year: 1972 },
     { title: 'Edit', year: 1974 },]
@@ -159,29 +162,49 @@ function Users() {
                 helperText={formik.touched.password && formik.errors.password}
               />
             </Grid>
+
+            <Grid xs={24} sx={{mt:2}}>
+            <TextField
+                label='Role'
+                variant='outlined'
+                size='small'
+                fullWidth
+                name='role'
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.role}
+                error={formik.touched.role && Boolean(formik.errors.role)}
+                helperText={formik.touched.role && formik.errors.role}
+              />
+            </Grid>
+
             <Grid xs={24} sx={{mt:2}}>
             <Autocomplete
       multiple
       id="checkboxes-tags-demo"
       options={top100Films}
+      value={find(top100Films, (o: any) => o.title === formik.values.role)}
+      getOptionLabel={(option: any) => option.title}
       disableCloseOnSelect
       size='small'
-      getOptionLabel={(option) => option.title}
-      renderOption={(props, option, { selected }) => (
+   
+      renderOption={(props, option) => (
         <li {...props}>
-          <Checkbox
-            icon={icon}
-            checkedIcon={checkedIcon}
-            style={{ marginRight: 8 }}
-            checked={selected}
-          />
+        
           {option.title}
         </li>
       )}
       style={{ width: "100%" }}
       renderInput={(params) => (
-        <TextField {...params} label="Permission"  />
+        <TextField {...params} label="Permission" name='permissions'
+        error={formik.touched.permissions && Boolean(formik.errors.permissions)}
+        helperText={formik.touched.permissions && formik.errors.permissions}
+        onBlur={formik.handleBlur}/>
+        
       )}
+      onChange={(e, value) => {
+        formik.setFieldValue('permissions', map(value,(val)=> val?.title))
+      }}
     />
             </Grid>
         
