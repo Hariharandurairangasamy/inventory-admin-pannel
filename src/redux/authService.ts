@@ -18,10 +18,15 @@ const login = async (userData:any) => {
     return response.data 
   
   };
+
+  const addUsersData= async(AddUserData:any)=>{
+const getResponce = await axios.post(`${SERVER.BACKEND_HOST_URL}/${API_END_POINT?.API_END_POINT?.POST_REGISTER_DATA}`, AddUserData)
+return getResponce.data
+  }
   
   const authService = {
-   
     login,
+    addUsersData
   };
   
   export default authService;

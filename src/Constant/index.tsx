@@ -36,7 +36,11 @@ const API_END_POINT={
     DELETE_CUSTOMER_DATA:"api/inventory/deleteCustomer",
     GET_UNIQUE_CUSTOMER_DATA:"api/inventory/getUniqueCustomerData",
     // LOGIN USER
-    POST_USER_LOGIN:"api/inventory/userLogin"
+    POST_USER_LOGIN:"api/inventory/userLogin",
+    //  Register
+    POST_REGISTER_DATA:"api/inventory/postUserData",
+    GET_USE_DATA:"api/inventory/getUsers",
+    DELETE_USER_DATA:"api/inventory/deleteUsers"
 
 
 }
