@@ -110,7 +110,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export default function SideBar() {
   const [open, setOpen] = useState<any>({})
 
-  const collectAllPageRoute = [
+  const collectAllPageRoute:any = [
     {
       id: 1,
       label: 'Inventory',
@@ -190,7 +190,14 @@ export default function SideBar() {
     }
   ]
 
-
+  const getPermissionFeilds = collectAllPageRoute?.reduce((acc:any,curr:any)=>{
+   
+      if(curr.label === ("Inventory"&&"Purchase")){
+        acc.push({...curr,permission:true})
+    }
+    return acc
+  },[])
+console.log("getPermissionFeilds",getPermissionFeilds)
 
 
   // REDUX STATES
