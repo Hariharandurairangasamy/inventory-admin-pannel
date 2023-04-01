@@ -109,6 +109,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function SideBar() {
   const [open, setOpen] = useState<any>({})
+  
+  // GET LOVALSTOREAGE VALUES
+
+  const getLocalStorageValues:any = localStorage.getItem("role")
+
 
   const collectAllPageRoute:any = [
     {
@@ -180,14 +185,20 @@ export default function SideBar() {
     }
   ]
 
-  const getPermissionFeilds = collectAllPageRoute?.reduce((acc:any,curr:any)=>{
-   
-      if(curr.label === ("Inventory"&&"Purchase")){
-        acc.push({...curr,permission:true})
+const getPermmisionRoute = collectAllPageRoute.reduce((acc:any,curr:any)=>{
+  if(JSON.parse(getLocalStorageValues) === "accountent" ){
+    if((curr.label === "Invoice" || curr.label === "Reports")){
+      acc.push(curr )
     }
-    return acc
-  },[])
-console.log("getPermissionFeilds",getPermissionFeilds)
+  }else if(JSON.parse(getLocalStorageValues) === "Manager"){
+    if((curr.label === "Invoice" || curr.label === "Reports" || curr.label === "Stock" || curr.label === "Payments" || curr.label === "Inventory")){
+      acc.push(curr )
+    }
+  }else{
+    acc.push(curr )
+  }
+  return acc
+},[])
 
 
   // REDUX STATES
@@ -282,7 +293,7 @@ console.log("getPermissionFeilds",getPermissionFeilds)
         </DrawerHeader>
         <Divider />
 
-        {map(collectAllPageRoute, (dropDownDatas) => (
+        {map(getPermmisionRoute, (dropDownDatas) => (
           <List key={dropDownDatas?.id}>
             <ListItemButton
               onClick={() => {
