@@ -106,7 +106,7 @@ export const handleRouter = createBrowserRouter([
         ),
       },
       {
-        path: '/PurchaseForm/:name',
+        path: '/PurchaseForm/:name/:id',
         element: (
           <PrivateRoute>
             <PurchaseForm />

@@ -165,16 +165,6 @@ export default function SideBar() {
       permission:null
     },
     {
-      id: 6,
-      label: 'Attendance',
-      logo: <Diversity3Icon />,
-      subDropDown: [
-        { id: 1, subLable: 'Employees', path: '/Employees' },
-        { id: 1, subLable: 'Attendance', path: '/EmployeesAttendence' },
-      ],
-      permission:null
-    },
-    {
       id: 7,
       label: 'Payments',
       logo: <PaidIcon />,

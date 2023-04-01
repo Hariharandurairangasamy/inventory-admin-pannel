@@ -40,7 +40,12 @@ const API_END_POINT={
     //  Register
     POST_REGISTER_DATA:"api/inventory/postUserData",
     GET_USE_DATA:"api/inventory/getUsers",
-    DELETE_USER_DATA:"api/inventory/deleteUsers"
+    DELETE_USER_DATA:"api/inventory/deleteUsers",
+    // Purchase
+    ADD_PURCHASE:"api/inventory/postPurchaseData",
+    UPDATE_PURCHASE:"api/inventory/updatePurchaseData",
+    GET_PURCHASE_DATA:"api/inventory/getPurchaseData",
+    GET_UNIQUE_PURCHASE:"api/inventory/getUniquePurchase"
 
 
 }

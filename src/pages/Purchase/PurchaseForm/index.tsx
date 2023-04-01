@@ -1,17 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState,useCallback,useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { Grid, Typography, TextField, Autocomplete, Button } from '@mui/material'
 import CustomPriceDataGrid from '../../../components/CustomPriceDataGrid'
 import TableCell from '@mui/material/TableCell'
 import AddIcon from '@mui/icons-material/Add'
 import ClearIcon from '@mui/icons-material/Clear'
 import { useFormik } from 'formik'
+import { ToastContainer,toast } from 'react-toastify'
+import { API_SERVICE } from '../../../Service'
+import API_END_POINT from "../../../Constant/index"
+import { AxiosError, AxiosResponse } from 'axios'
 import * as Yup from 'yup'
 import { find, get, map } from 'lodash'
 
 function PurchaseForm() {
+   const[getCustomerDatas,setGetCustomersData]=useState<any>()
+   const [getCategoryData,setGetCategoryData]=useState<any>()
+   const[getProductName,setGetProductName]=useState<any>()
   const [inputFeilds, setInputFeilds] = useState<any>([
     { Category: '', productName: '', Price: '', QTY: '', GST: '', Total: '' },
   ])
+
   // handle input change
   const handleInputChange = (e: any, index: number) => {
     const { name, value } = e.target
@@ -34,24 +43,76 @@ function PurchaseForm() {
     ])
   }
 
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-  ]
+  const getParamsValues = useParams()
+const getCustomerData = useCallback(()=>{
+  // get customers data
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_CUSTOMERS_DATA}`,(res:AxiosResponse)=>{
+    setGetCustomersData(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+  // get category data
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_CATEGORIES_DATA}`,(res:AxiosResponse)=>{
+    setGetCategoryData(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+  // get productname data
+  API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_PRODUCTS_DATA}`,(res:AxiosResponse)=>{
+    setGetProductName(get(res,"data.data",[]))
+  },(err:AxiosError)=>{
+    console.log(err)
+  })
+},[])
+
+
+  const paidStatusValues:any=[{
+    label:"Paid"
+  },{label:"nonPaid"}]
 
   const formik = useFormik({
     initialValues: {
-      Date: '',
-      invoceNumber: '',
+      date: '',
+      invoiceNumber: '',
       paidStatus: '',
       customerName: '',
-      metaData: {},
+      isPurchaseProducts: {},
     },
     validationSchema: Yup.object({}),
-    onSubmit: (values) => {
-      values.metaData = inputFeilds
+    onSubmit: (values,{resetForm}) => {
+      values.isPurchaseProducts = inputFeilds
+
+      getParamsValues.name === "Add" || null ? API_SERVICE.postApiData(`${API_END_POINT.API_END_POINT.ADD_PURCHASE}`,(res:AxiosResponse)=>{
+        toast.success(" Data added SuccessFully")
+        resetForm()
+      },(err:AxiosError)=>{
+        console.log(err)
+        toast.error("Purchase Not Added")
+      },values)
+      : API_SERVICE.updateApiData(`${API_END_POINT.API_END_POINT.UPDATE_PURCHASE}/${getParamsValues?.id}`,(res:AxiosResponse)=>{
+        toast.success("Purchase Data Updated")
+        resetForm()
+      },(err:AxiosError)=>{
+        console.log(err)
+        toast.error("Purchase Data Not Updated")
+      },values)
     },
   })
+  useEffect(()=>{
+    if(getParamsValues?.id){
+      API_SERVICE.fetchApiData(`${API_END_POINT.API_END_POINT.GET_UNIQUE_PURCHASE}/${getParamsValues?.id}`,(res:AxiosResponse)=>{ 
+     
+        formik.setFieldValue("invoiceNumber",get(res,"data.data.invoiceNumber",""))
+        formik.setFieldValue("date",get(res,"data.data.date","")) 
+        formik.setFieldValue("customerName",get(res,"data.data.customerName","")) 
+        formik.setFieldValue("paidStatus",get(res,"data.data.paidStatus","")) 
+      },(err:AxiosError)=>{
+        console.log(err)
+      })
+    }
+    getCustomerData()
+  },[getCustomerData,getParamsValues?.id])
+
 
   return (
     <div style={{ marginTop: 10 }}>
@@ -66,27 +127,27 @@ function PurchaseForm() {
               variant='outlined'
               size='small'
               sx={{ width: 300 }}
-              name='Date'
+              name='date'
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.Date}
-              error={formik.touched.Date && Boolean(formik.errors.Date)}
-              helperText={formik.touched.Date && formik.errors.Date}
+              value={formik.values.date}
+              error={formik.touched.date && Boolean(formik.errors.date)}
+              helperText={formik.touched.date && formik.errors.date}
             />
           </Grid>
           <Grid xs={4}>
             <TextField
               id='outlined-basic'
-              label='InvoceNumber'
+              label='invoiceNumber'
               variant='outlined'
               size='small'
               sx={{ width: 300 }}
-              name='invoceNumber'
+              name='invoiceNumber'
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.invoceNumber}
-              error={formik.touched.invoceNumber && Boolean(formik.errors.invoceNumber)}
-              helperText={formik.touched.invoceNumber && formik.errors.invoceNumber}
+              value={formik.values.invoiceNumber}
+              error={formik.touched.invoiceNumber && Boolean(formik.errors.invoiceNumber)}
+              helperText={formik.touched.invoiceNumber && formik.errors.invoiceNumber}
             />
           </Grid>
 
@@ -94,10 +155,12 @@ function PurchaseForm() {
             <Autocomplete
               disablePortal
               id='combo-box-demo'
-              options={top100Films}
+              options={paidStatusValues}
+              defaultValue={paidStatusValues}
+              getOptionLabel={(paidStatusValues:any)=> paidStatusValues.label ?? "" }
               size='small'
               sx={{ width: 300 }}
-              value={find(top100Films, (o: any) => o.label === formik.values.paidStatus)}
+              value={find(paidStatusValues, (o: any) => o.label === formik.values.paidStatus) ?? ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -109,32 +172,38 @@ function PurchaseForm() {
                 />
               )}
               onChange={(e, value) => {
-                formik.setFieldValue('paidStatus', get(value, 'label'))
+                formik.setFieldValue('paidStatus', get(value, 'paidStatus'))
               }}
             />
           </Grid>
           <Grid xs={4} sx={{ mt: 3 }}>
-            <Autocomplete
-              disablePortal
-              id='combo-box-demo'
-              options={top100Films}
-              value={find(top100Films, (o: any) => o.label === formik.values.customerName)}
-              size='small'
-              sx={{ width: 300 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label='Customer Name'
-                  name='customerName'
-                  error={formik.touched.customerName && Boolean(formik.errors.customerName)}
-                  helperText={formik.touched.customerName && formik.errors.customerName}
-                  onBlur={formik.handleBlur}
-                />
-              )}
-              onChange={(e, value) => {
-                formik.setFieldValue('customerName', get(value, 'label'))
-              }}
-            />
+            
+                <Autocomplete
+                disablePortal
+                id='category'
+                size='small'
+                style={{ width: '100%' }}
+                options={getCustomerDatas }
+                defaultValue={getCustomerDatas}
+                getOptionLabel={(option: any) => option?.customerName ?? "" }
+                value={find(getCustomerDatas, (o: any) => o?.customerName === formik.values.customerName ) ?? ""}
+                freeSolo
+                sx={{ width: 300 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label='CustomerName'
+                    name='customerName'
+                    error={formik.touched.customerName && Boolean(formik.errors.customerName)}
+                    helperText={formik.touched.customerName && formik.errors.customerName}
+                    onBlur={formik.handleBlur}
+                  />
+                )}
+                onChange={(e, value) => {
+             
+                  formik.setFieldValue('customerName', get(value, 'customerName',""))
+                }}
+              />
           </Grid>
         </Grid>
         <Grid container spacing={2} sx={{ mt: 3 }}>
@@ -149,12 +218,12 @@ function PurchaseForm() {
                       <Autocomplete
                         disablePortal
                         id='combo-box-demo'
-                        options={top100Films}
+                        options={getCategoryData}
                         size='small'
-                        getOptionLabel={(option: any) => option.label}
-                        value={find(top100Films, (o: any) => o.label === element.Category)}
+                        getOptionLabel={(option: any) => option.categoriesName}
+                        value={find(getCategoryData, (o: any) => o.categoriesName === element.categoriesName)}
                         onChange={(e, value) => {
-                          handleInputChange(e, index), (element.Category = value?.label)
+                          handleInputChange(e, index), (element.Category = value?.categoriesName)
                         }}
                         renderInput={(params) => <TextField {...params} name='Category' />}
                       />
@@ -165,12 +234,12 @@ function PurchaseForm() {
                       <Autocomplete
                         disablePortal
                         id='combo-box-demo'
-                        options={top100Films}
+                        options={getProductName}
                         size='small'
-                        getOptionLabel={(option: any) => option.label}
-                        value={find(top100Films, (o: any) => o.label === element.productName)}
+                        getOptionLabel={(option: any) => option.productName}
+                        value={find(getProductName, (o: any) => o.productName === element.productName)}
                         onChange={(e, value) => {
-                          handleInputChange(e, index), (element.productName = value?.label)
+                          handleInputChange(e, index), (element.productName = value?.productName)
                         }}
                         renderInput={(params) => <TextField {...params} name='productName' />}
                       />
@@ -251,6 +320,7 @@ function PurchaseForm() {
           </Grid>
         </Grid>
       </form>
+      <ToastContainer />
     </div>
   )
 }
