@@ -18,7 +18,7 @@ function PurchaseForm() {
    const [getCategoryData,setGetCategoryData]=useState<any>()
    const[getProductName,setGetProductName]=useState<any>()
   const [inputFeilds, setInputFeilds] = useState<any>([
-    { Category: '', productName: '', Price: '', QTY: '', GST: '', Total: '' },
+    { category: '', productName: '', price: '', qty: '', gst: '', total: '' },
   ])
 
   // handle input change
@@ -26,6 +26,7 @@ function PurchaseForm() {
     const { name, value } = e.target
     const list = [...inputFeilds]
     list[index][name] = value
+    console.log("list",list)
     setInputFeilds(list)
   }
   // handle click event of the Remove button
@@ -39,7 +40,7 @@ function PurchaseForm() {
   const handleAddClick = () => {
     setInputFeilds([
       ...inputFeilds,
-      { Category: '', productName: '', Price: '', QTY: '', GST: '', Total: '' },
+      { category: '', productName: '', price: '', qty: '', gst: '', total: '' },
     ])
   }
 
@@ -106,6 +107,9 @@ const getCustomerData = useCallback(()=>{
         formik.setFieldValue("date",get(res,"data.data.date","")) 
         formik.setFieldValue("customerName",get(res,"data.data.customerName","")) 
         formik.setFieldValue("paidStatus",get(res,"data.data.paidStatus","")) 
+
+        setInputFeilds(get(res,"data.data.isPurchaseProducts",""))
+
       },(err:AxiosError)=>{
         console.log(err)
       })
@@ -158,9 +162,10 @@ const getCustomerData = useCallback(()=>{
               options={paidStatusValues}
               defaultValue={paidStatusValues}
               getOptionLabel={(paidStatusValues:any)=> paidStatusValues.label ?? "" }
+              isOptionEqualToValue={(paidStatusValues:any)=> paidStatusValues.label ?? ""}
               size='small'
               sx={{ width: 300 }}
-              value={find(paidStatusValues, (o: any) => o.label === formik.values.paidStatus) ?? ""}
+              value={find(paidStatusValues, (o: any) => o.label === formik.values.paidStatus)??""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -172,7 +177,7 @@ const getCustomerData = useCallback(()=>{
                 />
               )}
               onChange={(e, value) => {
-                formik.setFieldValue('paidStatus', get(value, 'paidStatus'))
+                formik.setFieldValue('paidStatus', get(value, 'paidStatus',""))
               }}
             />
           </Grid>
@@ -223,9 +228,10 @@ const getCustomerData = useCallback(()=>{
                         getOptionLabel={(option: any) => option.categoriesName}
                         value={find(getCategoryData, (o: any) => o.categoriesName === element.categoriesName)}
                         onChange={(e, value) => {
-                          handleInputChange(e, index), (element.Category = value?.categoriesName)
+                          console.log("val",)
+                          handleInputChange(e, index), (element.category = value?.categoriesName)
                         }}
-                        renderInput={(params) => <TextField {...params} name='Category' />}
+                        renderInput={(params) => <TextField {...params} name='category' />}
                       />
                     </TableCell>
                   </Grid>
@@ -249,7 +255,7 @@ const getCustomerData = useCallback(()=>{
                     <TableCell>
                       <TextField
                         size='small'
-                        name='Price'
+                        name='price'
                         value={element.Price}
                         onChange={(e) => handleInputChange(e, index)}
                       />
@@ -259,7 +265,7 @@ const getCustomerData = useCallback(()=>{
                     <TableCell>
                       <TextField
                         size='small'
-                        name='QTY'
+                        name='qty'
                         value={element.QTY}
                         onChange={(e) => handleInputChange(e, index)}
                       />
@@ -268,7 +274,7 @@ const getCustomerData = useCallback(()=>{
                   <Grid xs={1.7}>
                     <TableCell>
                       <TextField
-                        name='GST'
+                        name='gst'
                         size='small'
                         value={element.GST}
                         onChange={(e) => handleInputChange(e, index)}
@@ -278,7 +284,7 @@ const getCustomerData = useCallback(()=>{
                   <Grid xs={1.7}>
                     <TableCell>
                       <TextField
-                        name='Total'
+                        name='total'
                         size='small'
                         value={element.Total}
                         onChange={(e) => handleInputChange(e, index)}
