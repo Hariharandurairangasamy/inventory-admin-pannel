@@ -12,7 +12,7 @@ function CustomToolbar() {
   )
 }
 function CustomDataGrid(props: any) {
-  const { rows, columns, height } = props
+  const { rows, columns, height,processRowUpdates } = props
 
   return (
     <div>
@@ -23,6 +23,8 @@ function CustomDataGrid(props: any) {
           pageSize={5}
           getRowId={(row: any) =>  row?._id}
           loading={rows === 0 ? true : false}
+      processRowUpdate={processRowUpdates}
+          editMode='row'
           rowsPerPageOptions={[5]}
           checkboxSelection
           disableSelectionOnClick

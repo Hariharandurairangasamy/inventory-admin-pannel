@@ -45,7 +45,8 @@ const API_END_POINT={
     ADD_PURCHASE:"api/inventory/postPurchaseData",
     UPDATE_PURCHASE:"api/inventory/updatePurchaseData",
     GET_PURCHASE_DATA:"api/inventory/getPurchaseData",
-    GET_UNIQUE_PURCHASE:"api/inventory/getUniquePurchase"
+    GET_UNIQUE_PURCHASE:"api/inventory/getUniquePurchase",
+    GET_ALL_PROGRESS_VALUE:"api/inventory/getAllDatas"
 
 
 }

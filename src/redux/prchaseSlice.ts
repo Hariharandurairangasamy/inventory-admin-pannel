@@ -1,60 +1,48 @@
-import { createAsyncThunk,createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { API_SERVICE } from "../Service";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API_END_POINT from "../Constant/index"
-import { AxiosError, AxiosResponse } from 'axios'
+import { RootState } from "./store";
+import axios from "axios";
 
-interface Pruchase{
-    isError: boolean,
-    getDatas:any,
-    isSuccess: boolean,
-    isLoading: boolean,
-    message: string,
+
+interface AuthUserData{
+data:any,
+loading:false,
+error:string | null
+}
+const initialState:AuthUserData={
+  data:null,
+  loading:false,
+  error:null 
 }
 
-const initialState:Pruchase={
-    isError: false,
-    getDatas:null,
-    isSuccess: false,
-    isLoading: false,
-    message: '',
-}
+// Define async thunk
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
+  const response = await axios.get(`${API_END_POINT.API_END_POINT.GET_ALL_PROGRESS_VALUE}`);
+  console.log("response",response)
+  return response.data;
+});
 
-export const getPurchaseDatas = createAsyncThunk("getPurchase",async()=>{
-   
-     await API_SERVICE.fetchApiData(`${API_END_POINT?.API_END_POINT?.GET_PURCHASE_DATA}`,(res:AxiosResponse)=>{
-            console.log("ggggg",res)
-           return res
-           },(err:AxiosError)=>{
-            console.log(err)
-           })
- 
+// Define Redux slice
+const getPurchasedata = createSlice({
+  name: "getPurchasedata",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPosts.pending, (state) => {
+       
+        state.error = null;
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchPosts.rejected, (state, action:any) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
+});
 
-    
-})
-
-export const getPurchaseValues = createSlice({
-    name:"getDatas",
-    initialState,
-    reducers:{
-     
-    },
-    extraReducers: (builder) => {
-        builder
-          .addCase(getPurchaseDatas.pending, (state) => {
-            state.isLoading = true;
-          })
-          .addCase(getPurchaseDatas.fulfilled, (state, action) => {
-            state.isLoading = false;
-            state.isSuccess = true;
-            state.getDatas = action.payload;
-          })
-          .addCase(getPurchaseDatas.rejected, (state, action:PayloadAction<any>) => {
-            state.isLoading = false;
-            state.isSuccess = false;
-            state.getDatas = null;
-            state.message = action.payload;
-          });
-      },
-})
-
-export default getPurchaseValues.reducer
+// Export actions and reducer
+export default getPurchasedata.reducer;

@@ -1,11 +1,15 @@
 import React from 'react'
 import { Grid, Typography } from '@mui/material'
+import {get} from "lodash"
 import LineChart from '../../components/LineChart'
 import BarChart from '../../components/Barchart'
 import CustomDataGrid from '../../components/DataGridTable'
+
 import { GridColDef } from '@mui/x-data-grid'
 
 function Home() {
+
+
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 90 },
     {
