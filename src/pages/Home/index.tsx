@@ -1,15 +1,24 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import { Grid, Typography } from '@mui/material'
 import {get} from "lodash"
 import LineChart from '../../components/LineChart'
 import BarChart from '../../components/Barchart'
 import CustomDataGrid from '../../components/DataGridTable'
+import { useAppDispatch,useAppSelector } from '../../hooks'
+import { fetchPosts } from '../../redux/prchaseSlice'
 
 import { GridColDef } from '@mui/x-data-grid'
 
 function Home() {
 
+  const dispatch = useAppDispatch()
+  const getProgressValue = useAppSelector((state)=> state.getProgressValue)
 
+  useEffect(()=>{
+dispatch(fetchPosts())
+  },[])
+
+console.log("getProgressValue",getProgressValue)
   const columns: GridColDef[] = [
     { field: '_id', headerName: 'ID', width: 90 },
     {

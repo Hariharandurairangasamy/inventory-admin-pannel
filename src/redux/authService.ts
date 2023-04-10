@@ -23,10 +23,18 @@ const login = async (userData:any) => {
 const getResponce = await axios.post(`${SERVER.BACKEND_HOST_URL}/${API_END_POINT?.API_END_POINT?.POST_REGISTER_DATA}`, AddUserData)
 return getResponce.data
   }
+
+  const getPurchaseData = async()=>{
+    const responceData = await axios.get(`${SERVER.BACKEND_HOST_URL}/${API_END_POINT.API_END_POINT.GET_ALL_PROGRESS_VALUE}`)
+    return responceData.data
+  }
+
+
   
   const authService = {
     login,
-    addUsersData
+    addUsersData,
+    getPurchaseData
   };
   
   export default authService;

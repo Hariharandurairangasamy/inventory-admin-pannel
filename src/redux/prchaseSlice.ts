@@ -1,48 +1,36 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import API_END_POINT from "../Constant/index"
-import { RootState } from "./store";
+
+import { createSlice, createAsyncThunk,PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-
-
-interface AuthUserData{
-data:any,
-loading:false,
-error:string | null
-}
-const initialState:AuthUserData={
-  data:null,
-  loading:false,
-  error:null 
-}
+import SERVER from "../Config";
+import API_END_POINT from "../Constant/index"
 
 // Define async thunk
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const response = await axios.get(`${API_END_POINT.API_END_POINT.GET_ALL_PROGRESS_VALUE}`);
-  console.log("response",response)
+  const response = await axios.get(`${SERVER.BACKEND_HOST_URL}/${API_END_POINT?.API_END_POINT?.GET_ALL_PROGRESS_VALUE}`);
   return response.data;
 });
 
 // Define Redux slice
-const getPurchasedata = createSlice({
-  name: "getPurchasedata",
-  initialState,
+const postsSlice = createSlice({
+  name: "posts",
+  initialState: { data: [], loading: false, error: null },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchPosts.pending, (state) => {
-       
+        state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
+      .addCase(fetchPosts.fulfilled, (state, action:PayloadAction<any>) => {
         state.loading = false;
         state.data = action.payload;
       })
-      .addCase(fetchPosts.rejected, (state, action:any) => {
+      .addCase(fetchPosts.rejected, (state, action:PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });
 
 // Export actions and reducer
-export default getPurchasedata.reducer;
+export default postsSlice.reducer;
